@@ -5,24 +5,7 @@
         <title></title>
     </head>
     <body>
-        <section>
-            <h3>Categories</h3>
-            <ul>
-                {% for c in categories %}
-                <li><a href="/category/{{ c.id }}">{{c.name }}</a></li>
-                {% endfor %}
-            </ul>
-        </section>
-
-        <section>
-            <h3>Latest Items</h3>
-            <ul>
-                {% for item in lastItems %}
-                <li><a href="/{{ item.cat_id }}/{{ item.id}}">{{item.title}}</a> (<a href="/{{item.item.id}}/items">{{ item.item.name }}</a>)</li>
-                {% endfor %}
-            </ul>
-        </section>
-
-
+        {% include 'categories_template.html' %}
+        {% include 'latest_template.html' %}
     </body>
 </html>

@@ -47,10 +47,42 @@ def newItem():
         return render_template('newItem.html', categories = categories)
 
 
-@app.route('/<int:cat_id>/<int:item_id>/')
+@app.route('/catalog/<int:cat_id>/<int:item_id>/')
 def showDescription(item_id, cat_id):
     item = session.query(Item).filter_by(id=item_id).one()
     return render_template('showDescription.html', item = item)
+
+
+@app.route('/catalog/<int:cat_id>/items/')
+def showItems(cat_id):
+    selectedCategory = session.query(Category).filter_by(id=cat_id).one()
+    categories = session.query(Category).all()
+    items = session.query(Item).filter_by(cat_id=cat_id).all()
+    number = session.query(Item).filter_by(cat_id=cat_id).count()
+    return render_template('items.html', categories = categories, selectedCategory = selectedCategory, items = items, number = number )
+
+
+@app.route('/catalog/<int:item_id>/edit/', methods=['GET','POST'])
+def editItem(item_id):
+    item = session.query(Item).filter_by(id=item_id).one()
+    categories = session.query(Category).all()
+    if request.method =='POST':
+        #editedItem = Item(
+
+
+        #session.execute(update(Item).where(id==item_id).values(title='lorem'))
+        #session.commit()
+        session.query(Item).\
+            filter(Item.id == item_id).\
+            update({"title": request.form['title'],\
+            "description": request.form['description'],\
+            "cat_id": request.form['category']})
+        session.commit()
+
+        return redirect(url_for('showLatestItems'))
+    else:
+        return render_template('edit_item.html', item = item, categories = categories)
+
 
 
 if __name__ == '__main__':
