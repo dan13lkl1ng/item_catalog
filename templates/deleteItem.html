@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Item</title>
+</head>
+<body>
+    <h1>Are you sure to delete {{ item.title }}?</h1>
+   <form action="{{ url_for('deleteItem', item_id = item.id)}}" method="POST">
+        <input type="SUBMIT" value="Delete">
+    </form>
+    <a href="{{ url_for('showLatestItems')}}">Cancel</a>
+    
+</body>
+</html>
