@@ -5,6 +5,19 @@
         <title>{{ title }}</title>
     </head>
     <body>
+        <nav>
+            Catalog app
+            {% if user %}
+            Logout
+
+            {% else %}
+            Login
+
+            {% endif %}
+
+        
+        
+        </nav>
         {% block body %}{% endblock %}
     </body>
 </html>
