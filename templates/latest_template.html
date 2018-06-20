@@ -1,9 +1,12 @@
-        <section>
-            {{ logged_in }}
-            <h3>Latest Items</h3>
-            <ul>
-                {% for item in lastItems %}
-                <li><a href="{{ url_for('showDescription',cat_id = item.cat_id, item_id = item.id) }}">{{item.title}}</a> (<a href="{{ url_for('showItems', cat_id = item.cat_id)}}">{{ item.item.name }}</a>)</li>
-                {% endfor %}
-            </ul>
-        </section>
+<section>
+    {% if user %}
+    <a href="{{ url_for('newItem') }} ">Add Item</a>
+    {% endif %}
+
+    <h3>Latest Items</h3>
+    <ul>
+        {% for item in lastItems %}
+        <li><a href="{{ url_for('showDescription',cat_id = item.cat_id, item_id = item.id) }}">{{item.title}}</a> (<a href="{{ url_for('showItems', cat_id = item.cat_id)}}">{{ item.item.name }}</a>)</li>
+        {% endfor %}
+    </ul>
+</section>

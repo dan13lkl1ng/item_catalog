@@ -20,10 +20,14 @@ session = scoped_session(sessionmaker(bind=engine))
 app = Flask(__name__)
 
 
+
 @auth.verify_password
 def verify_password(username, password):
     print( "Looking for user %s" % username)
     user = session.query(User).filter_by(username = username).first()
+    if username == '' or password =='':
+        g.user = None
+        return True
     if not user: 
         print("User not found")
         return False
@@ -36,6 +40,7 @@ def verify_password(username, password):
 
 
 @app.route('/')
+@auth.login_required
 def showLatestItems():
     #lastItems = session.query.order_by('-id').first()
 
@@ -44,8 +49,12 @@ def showLatestItems():
 
     lastItems = session.query(Item).order_by(Item.id.desc()).limit(10).all()
 
+    return render_template('index.html', lastItems = lastItems, categories = categories, user = g.user, title='Items Catalog')
 
-    return render_template('index.html', lastItems = lastItems, categories = categories, logged_in = True if g.user else False )
+@app.route('/bbb')
+@auth.login_required
+def index():
+    return "Hello, %s!" % auth.username()
 
 
 @app.route('/item/new/', methods=['GET','POST'])
@@ -64,9 +73,10 @@ def newItem():
 
 
 @app.route('/catalog/<int:cat_id>/<int:item_id>/')
+@auth.login_required
 def showDescription(item_id, cat_id):
     item = session.query(Item).filter_by(id=item_id).one()
-    return render_template('showDescription.html', item = item)
+    return render_template('showDescription.html', item = item, user = g.user)
 
 
 @app.route('/catalog/<int:cat_id>/items/')

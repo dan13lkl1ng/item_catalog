@@ -1,2 +1,5 @@
-        {% include 'categories_template.html' %}
-        {% include 'latest_template.html' %}
+{% extends "layout.html" %}
+{% block body %}
+{% include 'categories_template.html' %}
+{% include 'latest_template.html' %}
+{% endblock %}

@@ -7,5 +7,10 @@
 <body>
     <h2>{{ item.title }}</h2>  
     <p>{{ item.description }}</p>
+
+    {% if user %}
+    <a href="{{ url_for('editItem', item_id = item.id) }}">Edit</a> |
+    <a href="{{ url_for('deleteItem', item_id = item.id) }}">Delete</a>
+    {% endif %}
 </body>
 </html>
