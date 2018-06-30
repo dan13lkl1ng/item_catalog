@@ -2,14 +2,21 @@
 {% block body %}
 {% include 'navigation_template.html' %}
 <div class="container">
-    <h3>{{ item.title }}</h3>  
-    <p>{{ item.description }}</p>
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h3>{{ item.title }}</h3>  
+            <hr>
+            
+            <p>{{ item.description }}</p>
 
-    {% if loggedIn == True %}
-    <div class="row EditItem__Buttons">
-        <a class="btn btn-outline-dark" href="{{ url_for('editItem', item_id = item.id) }}">Edit</a>  
-        <a class="btn btn-outline-danger" href="{{ url_for('deleteItem', item_id = item.id) }}">Delete</a>
+            {% if loggedIn == True %}
+            <hr>
+            <div class="row EditItem__Buttons">
+                <a class="btn btn-outline-dark" href="{{ url_for('editItem', item_id = item.id) }}">Edit</a>  
+                <a class="btn btn-outline-danger" href="{{ url_for('deleteItem', item_id = item.id) }}">Delete</a>
+            </div>
+            {% endif %}
+        </div>
     </div>
-    {% endif %}
 </div>
 {% endblock %}
