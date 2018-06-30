@@ -3,3 +3,4 @@ __pycache__/
 client_secret.json
 view_bak.py
 database_setup.pyc
+node_modules
