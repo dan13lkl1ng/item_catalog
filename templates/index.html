@@ -1,5 +1,22 @@
 {% extends "layout.html" %}
 {% block body %}
-{% include 'categories_template.html' %}
-{% include 'latest_template.html' %}
+{% include 'navigation_template.html' %}
+
+
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            {% include 'categories_template.html' %}
+        </div>
+
+
+        <div class="col">
+        {% include 'latest_template.html' %}
+        </div>
+    </div>
+</div>
+
+
+
 {% endblock %}

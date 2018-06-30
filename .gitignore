@@ -1,2 +1,5 @@
 catalog.db
 __pycache__/
+client_secret.json
+view_bak.py
+database_setup.pyc

@@ -1,27 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Item</title>
-</head>
-<body>
-    <h1>Edit Item</h1>
-    <form action="{{ url_for('editItem', item_id = item.id)}}" method="post">
-   <label for="title">Title</label> 
-   <input type="text" size="30" name="title" value="{{item.title}}"> <br>
+{% extends "layout.html" %}
+{% block body %}
+{% include 'navigation_template.html' %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h3>Edit Item</h3>
+            <form action="{{ url_for('editItem', item_id = item.id)}}" method="post">
+                <div class="form-group">
+                <label for="title">Title</label> 
+                <input class="form-control" type="text" size="30" name="title" value="{{item.title}}"> <br>
+                </div>
 
-   <label for="description">Description</label>
-   <input type="text" size=="30" name="description" value="{{ item.description }}"> <br>
+                <div class="form-group">
+                <label for="description">Description</label>
+                <input class="form-control" type="text" size=="30" name="description" value="{{ item.description }}"> <br>
+                </div>
 
-   <label for="category">Category</label>
-   <select name="category">
-              {% for category in categories %}
-              <option value="{{ category.id }}" {% if item.cat_id == category.id %} selected {% endif %}   >{{ category.name }}</option>
-              {% endfor %}
-            </select>
-            <br>
-            
-    <input type="submit" value="Edit">
-    </form>
-</body>
-</html>
+                <div class="form-group">
+                <label for="category">Category</label>
+                <select class="form-control" name="category">
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" {% if item.cat_id == category.id %} selected {% endif %}   >{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+                </div>
+                <br>
+
+                <input type="submit" class="btn btn-outline-primary" value="Edit">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

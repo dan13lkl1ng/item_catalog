@@ -2,22 +2,15 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
         <title>{{ title }}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bootstrap-material-design/dist/css/bootstrap-material-design.css') }}">
+
+
     </head>
     <body>
-        <nav>
-            Catalog app
-            {% if user %}
-            Logout
-
-            {% else %}
-            Login
-
-            {% endif %}
-
-        
-        
-        </nav>
         {% block body %}{% endblock %}
     </body>
 </html>

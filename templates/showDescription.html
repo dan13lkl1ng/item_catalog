@@ -1,16 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
-    <h2>{{ item.title }}</h2>  
+{% extends "layout.html" %}
+{% block body %}
+{% include 'navigation_template.html' %}
+<div class="container">
+    <h3>{{ item.title }}</h3>  
     <p>{{ item.description }}</p>
 
-    {% if user %}
-    <a href="{{ url_for('editItem', item_id = item.id) }}">Edit</a> |
-    <a href="{{ url_for('deleteItem', item_id = item.id) }}">Delete</a>
+    {% if loggedIn == True %}
+    <div class="row EditItem__Buttons">
+        <a class="btn btn-outline-dark" href="{{ url_for('editItem', item_id = item.id) }}">Edit</a>  
+        <a class="btn btn-outline-danger" href="{{ url_for('deleteItem', item_id = item.id) }}">Delete</a>
+    </div>
     {% endif %}
-</body>
-</html>
+</div>
+{% endblock %}

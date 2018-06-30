@@ -1,6 +1,6 @@
 <section>
     <h3>Categories</h3>
-    <ul>
+    <ul class="list-unstyled">
         {% for c in categories %}
         <li><a href="{{ url_for('showItems', cat_id = c.id) }}">{{ c.name }}</a></li>
         {% endfor %}

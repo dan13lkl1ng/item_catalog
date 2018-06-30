@@ -1,21 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title></title>
-    </head>
-    <body>
-        {% include 'categories_template.html' %}
+{% extends "layout.html" %}
+{% block body %}
+{% include 'navigation_template.html' %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            {% include 'categories_template.html' %}
+        </div>
+        <div class="col">
         <section>
-
             <h3>{{ selectedCategory.name }}  Items ({{ number }} items)</h3>
             <ul>
                 {% for item in items %}
-                <li><a href="{{ url_for('showDescription', cat_id = item.cat_id, item_id = item.id) }}">{{ item.title }}</a></li>
+                <li class="list-unstyled"><a href="{{ url_for('showDescription', cat_id = item.cat_id, item_id = item.id) }}">{{ item.title }}</a></li>
                 {% endfor %}
             </ul>
         </section>
-
-
-    </body>
-</html>
+        </div>
+    </div>
+</div>
+{% endblock %}
