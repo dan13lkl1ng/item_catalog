@@ -1,21 +1,18 @@
 #!/usr/bin/env python2
 
-from database_setup import Base, Category, Item , User#, Bagel
+from database_setup import Base, Category, Item, User
 from datetime import datetime
 from flask import Flask, url_for, render_template, redirect, request, flash
 from flask import make_response
 from flask import session as login_session
-from flask_login import current_user, login_user, logout_user
 from oauth2client.client import FlowExchangeError
 from oauth2client.client import flow_from_clientsecrets
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
-from sqlalchemy.orm import relationship, sessionmaker, scoped_session, lazyload, joinedload
+from sqlalchemy.orm import sessionmaker, scoped_session
 import httplib2
 import json
 import random
 import requests
-from flask_login import LoginManager
 import string
 
 CLIENT_ID = json.loads(
@@ -27,10 +24,6 @@ engine = create_engine('sqlite:///catalog.db')
 Base.metadata.bind = engine
 session = scoped_session(sessionmaker(bind=engine))
 app = Flask(__name__)
-#login_manager.init_app(app)
-#login_manager = LoginManager()
-#login_manager.init_app(app)
-
 
 
 @app.route('/login')
@@ -38,8 +31,8 @@ def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in range(32))
     login_session['state'] = state
-    # return "The current session state is %s" % login_session['state']
     return render_template('login.html', STATE=state)
+
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -93,7 +86,8 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
+        response = make_response(json.dumps(
+                   'Current user is already connected.'),
                                  200)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -125,7 +119,8 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;".\
+              "-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print("done!")
     return output
@@ -135,17 +130,18 @@ def gconnect():
 def gdisconnect():
     credentials = login_session.get('credentials')
     if credentials is None:
-        response = make_response(json.dumps('Current user not connected.'), 401)
+        response = make_response(json.dumps('Current user not connected.'),
+                                 401)
         response.headers['Content-Type'] = 'application/json'
-        #return response
+        # return response
     return redirect(url_for('showLatestItems'))
     access_token = credentials.access_token
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
-    h =  httplib2.Http()
+    h = httplib2.Http()
     result = h.request(url, 'GET')[0]
 
-    if result['status']== '200':
-        #Reset the user's session.
+    if result['status'] == '200':
+        # Reset the user's session.
         del login_session['credentials']
         del login_session['gplus_id']
         del login_session['username']
@@ -154,22 +150,20 @@ def gdisconnect():
 
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
-        #return response
+        # return response
     return redirect(url_for('showLatestItems'))
+
 
 @app.route('/')
 def showLatestItems():
-    #lastItems = session.query.order_by('-id').first()
-
-
     categories = session.query(Category).all()
-
     lastItems = session.query(Item).order_by(Item.id.desc()).limit(10).all()
 
-    if 'username' in login_session:
-        #print login_session['user_id']
-        print 'bbb'
-    return render_template('index.html', lastItems = lastItems, categories = categories, title='Items Catalog', loggedIn=loggedIn())
+    return render_template('index.html', lastItems=lastItems,
+                           categories=categories,
+                           title='Items Catalog',
+                           loggedIn=loggedIn())
+
 
 @app.route('/catalog/<int:cat_id>/items/')
 def showItems(cat_id):
@@ -177,21 +171,32 @@ def showItems(cat_id):
     categories = session.query(Category).all()
     items = session.query(Item).filter_by(cat_id=cat_id).all()
     number = session.query(Item).filter_by(cat_id=cat_id).count()
-    return render_template('items.html', categories = categories, selectedCategory = selectedCategory, items = items, number = number, loggedIn = loggedIn() )
+    return render_template('items.html', categories=categories,
+                           selectedCategory=selectedCategory,
+                           items=items,
+                           number=number,
+                           loggedIn=loggedIn())
 
-@app.route('/item/new/', methods=['GET','POST'])
+
+@app.route('/item/new/', methods=['GET', 'POST'])
 def newItem():
     categories = session.query(Category).all()
     if request.method == 'POST':
-        newItem = Item(title = request.form['title'], cat_id = request.form['category'], description=request.form['description'], datetime = datetime.now(), user_id = login_session['user_id'])
+        newItem = Item(title=request.form['title'],
+                       cat_id=request.form['category'],
+                       description=request.form['description'],
+                       datetime=datetime.now(),
+                       user_id=login_session['user_id'])
         session.add(newItem)
         session.commit()
         flash("New Item Created!")
         return redirect(url_for('showLatestItems'))
-    elif loggedIn() == True:
-        return render_template('newItem.html', categories = categories, loggedIn = loggedIn())
-    else: 
+    elif loggedIn() is True:
+        return render_template('newItem.html', categories=categories,
+                               loggedIn=loggedIn())
+    else:
         return redirect(url_for('showLatestItems'))
+
 
 def loggedIn():
     if 'username' in login_session:
@@ -199,57 +204,75 @@ def loggedIn():
     else:
         return False
 
+
 @app.route('/catalog/<int:cat_id>/<int:item_id>/')
 def showDescription(item_id, cat_id):
 
     item = session.query(Item).filter_by(id=item_id).one()
-    return render_template('showDescription.html', item = item, loggedIn = loggedIn())
+    return render_template('showDescription.html',
+                           item=item,
+                           loggedIn=loggedIn())
+
 
 def getUserID(email):
-    try: 
-        user = session.query(User).filter_by(email = email).one()
+    try:
+        user = session.query(User).filter_by(email=email).one()
         return user.id
-    except:
+    except IOError:
         return None
 
-@app.route('/catalog/<int:item_id>/delete/', methods=['GET','POST']) 
+
+@app.route('/catalog/<int:item_id>/delete/', methods=['GET', 'POST'])
 def deleteItem(item_id):
-    itemToDelete = session.query(Item).filter_by(id=item_id).filter_by(user_id=login_session['user_id']).one()
+    itemToDelete = session.query(Item).filter_by(id=item_id).\
+            filter_by(user_id=login_session['user_id']).one()
     if request.method == 'POST':
         session.delete(itemToDelete)
         session.commit()
         flash("Item deleted")
         return redirect(url_for('showLatestItems'))
     else:
-        return render_template('deleteItem.html', item=itemToDelete, loggedIn = loggedIn())
+        return render_template('deleteItem.html',
+                               item=itemToDelete,
+                               loggedIn=loggedIn())
 
-@app.route('/catalog/<int:item_id>/edit/', methods=['GET','POST'])
+
+@app.route('/catalog/<int:item_id>/edit/', methods=['GET', 'POST'])
 def editItem(item_id):
-    item = session.query(Item).filter_by(id=item_id).filter_by(user_id=login_session['user_id']).one()
+    item = session.query(Item).filter_by(id=item_id).\
+           filter_by(user_id=login_session['user_id']).one()
     categories = session.query(Category).all()
-    if request.method =='POST':
+    if request.method == 'POST':
         session.query(Item).\
             filter(Item.id == item_id).\
-            update({"title": request.form['title'],\
-            "description": request.form['description'],\
-            "cat_id": request.form['category'],\
-            "user_id": login_session['user_id']})
+            update({"title": request.form['title'],
+                    "description": request.form['description'],
+                    "cat_id": request.form['category'],
+                    "user_id": login_session['user_id']})
         session.commit()
 
         return redirect(url_for('showLatestItems'))
     else:
-        return render_template('edit_item.html', item = item, categories = categories, loggedIn = loggedIn())
+        return render_template('edit_item.html',
+                               item=item,
+                               categories=categories,
+                               loggedIn=loggedIn())
+
 
 def getUserInfo(user_id):
-    user = session.query(User).filter_by(id = user_id).one()
+    user = session.query(User).filter_by(id=user_id).one()
     return user
 
+
 def createUser(login_session):
-    newUser = User(name=login_session['username'], email=login_session['email'], picture = login_session['picture'])
+    newUser = User(name=login_session['username'],
+                   email=login_session['email'],
+                   picture=login_session['picture'])
     session.add(newUser)
     session.commit()
     user = session.query(User).filter_by(email=login_session['email']).one()
     return user.id
+
 
 if __name__ == '__main__':
     app.secret_key = 'super secret key'
