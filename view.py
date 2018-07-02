@@ -14,6 +14,7 @@ import json
 import random
 import requests
 import string
+from sqlalchemy.orm.exc import NoResultFound
 
 CLIENT_ID = json.loads(
     open('client_secret.json', 'r').read())['web']['client_id']
@@ -227,7 +228,7 @@ def getUserID(email):
     try:
         user = session.query(User).filter_by(email=email).one()
         return user.id
-    except ValueError:
+    except NoResultFound:
         return None
 
 
