@@ -16,6 +16,7 @@ $ git clone git@github.com:dan13lkl1ng/item_catalog.git
 ```
 2. Create Sqlite-Database
 ```
+$ cd item_catalog
 $ touch catalog.db
 $ python lotsOfItems.py
 ```
@@ -24,8 +25,10 @@ $ python lotsOfItems.py
 $ cd static
 $ npm i
 ```
-4. Start server
+4. Get Credentials from Google Oauth and save as ```client_secret.json```
+5. Start server
 ```
+$ cd ..
 $ python view.py 
 ```
 ## Built with
