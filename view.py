@@ -3,7 +3,7 @@
 from database_setup import Base, Category, Item, User
 from datetime import datetime
 from flask import Flask, url_for, render_template, redirect, request, flash
-from flask import make_response
+from flask import make_response, jsonify
 from flask import session as login_session
 from oauth2client.client import FlowExchangeError
 from oauth2client.client import flow_from_clientsecrets
@@ -122,7 +122,6 @@ def gconnect():
     output += ' " style = "width: 300px; height: 300px;border-radius: 150px;".\
               "-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
-    print("done!")
     return output
 
 
@@ -171,7 +170,8 @@ def showItems(cat_id):
     categories = session.query(Category).all()
     items = session.query(Item).filter_by(cat_id=cat_id).all()
     number = session.query(Item).filter_by(cat_id=cat_id).count()
-    return render_template('items.html', categories=categories,
+    return render_template('items.html',
+                           categories=categories,
                            selectedCategory=selectedCategory,
                            items=items,
                            number=number,
@@ -187,6 +187,7 @@ def newItem():
                        description=request.form['description'],
                        datetime=datetime.now(),
                        user_id=login_session['user_id'])
+
         session.add(newItem)
         session.commit()
         flash("New Item Created!")
@@ -199,6 +200,13 @@ def newItem():
 
 
 def loggedIn():
+    """
+    Checks if user is logged in.
+
+    Returns:
+        True if user is logged in
+        False if user is not logged in
+    """
     if 'username' in login_session:
         return True
     else:
@@ -215,10 +223,11 @@ def showDescription(item_id, cat_id):
 
 
 def getUserID(email):
+    """Searches for and returns id for given email address."""
     try:
         user = session.query(User).filter_by(email=email).one()
         return user.id
-    except IOError:
+    except ValueError:
         return None
 
 
@@ -259,6 +268,24 @@ def editItem(item_id):
                                loggedIn=loggedIn())
 
 
+@app.route('/api/categories')
+def categoriesJSON():
+    categories = session.query(Category).all()
+    return jsonify(categories=[c.serialize for c in categories])
+
+
+@app.route('/api/categories/<int:cat_id>/')
+def categoryJSON(cat_id):
+    items = session.query(Item).filter(Item.cat_id == cat_id).all()
+    return jsonify(category_items=[c.serialize for c in items])
+
+
+@app.route('/api/categories/<int:cat_id>/item/<int:id>/')
+def songJSON(cat_id, id):
+    item = session.query(Item).filter(Item.id == id).one()
+    return jsonify(item=item.serialize)
+
+
 def getUserInfo(user_id):
     user = session.query(User).filter_by(id=user_id).one()
     return user
@@ -274,6 +301,10 @@ def createUser(login_session):
     return user.id
 
 
+"""
+Code in this section only runs when program is executed
+directly.
+"""
 if __name__ == '__main__':
     app.secret_key = 'super secret key'
     app.debug = True

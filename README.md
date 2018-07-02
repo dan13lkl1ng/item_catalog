@@ -35,3 +35,5 @@ $ python view.py
 ## Third Party Dependencies
 * Google OAuth
 
+## Issues
+* Not secured against XSS
