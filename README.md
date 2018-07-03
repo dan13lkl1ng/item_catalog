@@ -18,6 +18,7 @@ $ git clone git@github.com:dan13lkl1ng/item_catalog.git
 ```
 $ cd item_catalog
 $ touch catalog.db
+$ python database_setup.py
 $ python lotsOfItems.py
 ```
 3. Solve NPM Dependencies

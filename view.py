@@ -15,6 +15,8 @@ import random
 import requests
 import string
 from sqlalchemy.orm.exc import NoResultFound
+from functools import wraps
+
 
 CLIENT_ID = json.loads(
     open('client_secret.json', 'r').read())['web']['client_id']
@@ -179,7 +181,19 @@ def showItems(cat_id):
                            loggedIn=loggedIn())
 
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' in login_session:
+            return f(*args, **kwargs)
+        else:
+            flash("You are not allowed to access there")
+            return redirect('/login')
+    return decorated_function
+
+
 @app.route('/item/new/', methods=['GET', 'POST'])
+@login_required
 def newItem():
     categories = session.query(Category).all()
     if request.method == 'POST':
@@ -233,6 +247,7 @@ def getUserID(email):
 
 
 @app.route('/catalog/<int:item_id>/delete/', methods=['GET', 'POST'])
+@login_required
 def deleteItem(item_id):
     itemToDelete = session.query(Item).filter_by(id=item_id).\
             filter_by(user_id=login_session['user_id']).one()
@@ -248,25 +263,31 @@ def deleteItem(item_id):
 
 
 @app.route('/catalog/<int:item_id>/edit/', methods=['GET', 'POST'])
+@login_required
 def editItem(item_id):
     item = session.query(Item).filter_by(id=item_id).\
            filter_by(user_id=login_session['user_id']).one()
-    categories = session.query(Category).all()
-    if request.method == 'POST':
-        session.query(Item).\
-            filter(Item.id == item_id).\
-            update({"title": request.form['title'],
-                    "description": request.form['description'],
-                    "cat_id": request.form['category'],
-                    "user_id": login_session['user_id']})
-        session.commit()
+    if item.user_id == login_session['user_id']:
+        categories = session.query(Category).all()
+        if request.method == 'POST':
+            session.query(Item).\
+                filter(Item.id == item_id).\
+                update({"title": request.form['title'],
+                        "description": request.form['description'],
+                        "cat_id": request.form['category'],
+                        "user_id": login_session['user_id']})
+            session.commit()
 
-        return redirect(url_for('showLatestItems'))
+            return redirect(url_for('showLatestItems'))
+        else:
+            return render_template('edit_item.html',
+                                   item=item,
+                                   categories=categories,
+                                   loggedIn=loggedIn())
     else:
-        return render_template('edit_item.html',
-                               item=item,
-                               categories=categories,
-                               loggedIn=loggedIn())
+        return jsonify({"error": "You are not authorized to perform such.\
+                        operation because you are not the creator of the.\
+                        item"})
 
 
 @app.route('/api/categories')
