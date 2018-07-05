@@ -39,6 +39,10 @@ def showLogin():
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
+    """
+        Gathers data from Google Sign In API and places it inside a session
+        variable.
+    """
     # Validate state token
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -130,6 +134,9 @@ def gconnect():
 
 @app.route("/gdisconnect")
 def gdisconnect():
+    """
+        Erases data in session and redires to showLatestItems.
+    """
     credentials = login_session.get('credentials')
     if credentials is None:
         response = make_response(json.dumps('Current user not connected.'),
