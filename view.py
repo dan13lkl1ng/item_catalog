@@ -17,12 +17,15 @@ import string
 from sqlalchemy.orm.exc import NoResultFound
 from functools import wraps
 
+# Blueprints
+from api.api import api
+
+
+
 
 CLIENT_ID = json.loads(
     open('client_secret.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Catalog App"
-
-GOOGLE_CLIENT_ID = "70937351854-a37bfh98hcdmuagv5dj5je38cjc276dp.apps.googleusercontent.com"
 
 engine = create_engine('sqlite:///catalog.db')
 
@@ -30,13 +33,15 @@ Base.metadata.bind = engine
 session = scoped_session(sessionmaker(bind=engine))
 app = Flask(__name__)
 
+app.register_blueprint(api)
+
 
 @app.route('/login')
 def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in range(32))
     login_session['state'] = state
-    return render_template('login.html', STATE=state, GOOGLE_CLIENT_ID = GOOGLE_CLIENT_ID)
+    return render_template('login.html', STATE=state, CLIENT_ID = CLIENT_ID)
 
 
 @app.route('/gconnect', methods=['POST'])
@@ -298,25 +303,6 @@ def editItem(item_id):
                         operation because you are not the creator of the.\
                         item"})
 
-
-@app.route('/api/categories')
-def categoriesJSON():
-    categories = session.query(Category).all()
-    return jsonify(categories=[c.serialize for c in categories])
-
-
-@app.route('/api/categories/<int:cat_id>/')
-def categoryJSON(cat_id):
-    items = session.query(Item).filter(Item.cat_id == cat_id).all()
-    return jsonify(category_items=[c.serialize for c in items])
-
-
-@app.route('/api/categories/<int:cat_id>/item/<int:id>/')
-def songJSON(cat_id, id):
-    item = session.query(Item).filter(Item.id == id).one()
-    return jsonify(item=item.serialize)
-
-
 def getUserInfo(user_id):
     user = session.query(User).filter_by(id=user_id).one()
     return user
@@ -330,7 +316,6 @@ def createUser(login_session):
     session.commit()
     user = session.query(User).filter_by(email=login_session['email']).one()
     return user.id
-
 
 """
 Code in this section only runs when program is executed
