@@ -132,35 +132,35 @@ def gconnect():
     return output
 
 
-@app.route("/gdisconnect")
+@app.route('/gdisconnect', methods=['GET', 'POST'])
 def gdisconnect():
-    """
-        Erases data in session and redires to showLatestItems.
-    """
-    credentials = login_session.get('credentials')
-    if credentials is None:
-        response = make_response(json.dumps('Current user not connected.'),
+    access_token = login_session.get('access_token')
+    if access_token is None:
+        response = make_response(json.dumps('Current user isn\'t connected.'),
                                  401)
         response.headers['Content-Type'] = 'application/json'
-        # return response
-    return redirect(url_for('showLatestItems'))
-    access_token = credentials.access_token
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
+        return response
+
+    # Use HTTP GET request to revoke the current user's access token
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' \
+          % access_token
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
 
-    if result['status'] == '200':
-        # Reset the user's session.
-        del login_session['credentials']
+    # check status of the response received in result
+    if result['status'] == '200' or '400':
+        del login_session['access_token']
         del login_session['gplus_id']
         del login_session['username']
         del login_session['email']
         del login_session['picture']
 
-        response = make_response(json.dumps('Successfully disconnected.'), 200)
+        return redirect(url_for('showLatestItems'))
+    else:
+        response = make_response(json.dumps('Failed to revoke token '
+                                            'for a given user.'), 400)
         response.headers['Content-Type'] = 'application/json'
-        # return response
-    return redirect(url_for('showLatestItems'))
+        return response
 
 
 @app.route('/')
