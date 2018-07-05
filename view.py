@@ -22,6 +22,8 @@ CLIENT_ID = json.loads(
     open('client_secret.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Catalog App"
 
+GOOGLE_CLIENT_ID = "70937351854-a37bfh98hcdmuagv5dj5je38cjc276dp.apps.googleusercontent.com"
+
 engine = create_engine('sqlite:///catalog.db')
 
 Base.metadata.bind = engine
@@ -34,7 +36,7 @@ def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in range(32))
     login_session['state'] = state
-    return render_template('login.html', STATE=state)
+    return render_template('login.html', STATE=state, GOOGLE_CLIENT_ID = GOOGLE_CLIENT_ID)
 
 
 @app.route('/gconnect', methods=['POST'])
