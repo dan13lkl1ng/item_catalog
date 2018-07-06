@@ -14,20 +14,24 @@ This project sets up a sqlite database for an item catalog app. The provided Pyt
 ```
 $ git clone git@github.com:dan13lkl1ng/item_catalog.git
 ```
-2. Create Sqlite-Database
+2. Install requirements 
 ```
 $ cd item_catalog
+$ pip install -r requirements.txt
+```
+3. Create Sqlite-Database
+```
 $ touch catalog.db
 $ python database_setup.py
 $ python lotsOfItems.py
 ```
-3. Solve NPM Dependencies
+4. Solve NPM Dependencies
 ```
 $ cd static
 $ npm i
 ```
-4. Get Credentials from Google Oauth and save as ```client_secret.json```
-5. Start server
+5. Get Credentials from Google Oauth and save as ```client_secret.json```
+6. Start server
 ```
 $ cd ..
 $ python view.py 
