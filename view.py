@@ -139,6 +139,9 @@ def gconnect():
 
 @app.route('/gdisconnect', methods=['GET', 'POST'])
 def gdisconnect():
+    """
+        Revokes OAuth Token from Google and deletes session.
+    """
     access_token = login_session.get('access_token')
     if access_token is None:
         response = make_response(json.dumps('Current user isn\'t connected.'),
@@ -170,6 +173,9 @@ def gdisconnect():
 
 @app.route('/')
 def showLatestItems():
+    """
+        Renders template with categories and the latest items.
+    """
     categories = session.query(Category).all()
     lastItems = session.query(Item).order_by(Item.id.desc()).limit(10).all()
 
@@ -181,6 +187,11 @@ def showLatestItems():
 
 @app.route('/catalog/<int:cat_id>/items/')
 def showItems(cat_id):
+    """
+        Renders template with items of a catgory.
+        args:
+        cat_id - ID of category
+    """
     selectedCategory = session.query(Category).filter_by(id=cat_id).one()
     categories = session.query(Category).all()
     items = session.query(Item).filter_by(cat_id=cat_id).all()
@@ -194,6 +205,7 @@ def showItems(cat_id):
 
 
 def login_required(f):
+    """ Decorator to guard routes. """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'username' in login_session:
@@ -207,6 +219,10 @@ def login_required(f):
 @app.route('/item/new/', methods=['GET', 'POST'])
 @login_required
 def newItem():
+    """
+        Creates new item if logged in, otherwise redirects to list of latest
+        items.
+    """
     categories = session.query(Category).all()
     if request.method == 'POST':
         newItem = Item(title=request.form['title'],
@@ -242,7 +258,13 @@ def loggedIn():
 
 @app.route('/catalog/<int:cat_id>/<int:item_id>/')
 def showDescription(item_id, cat_id):
+    """
+        Renders template with description of a specific item.
 
+        args:
+        cat_id - ID of category
+        item_id - ID of item
+    """
     item = session.query(Item).filter_by(id=item_id).one()
     return render_template('showDescription.html',
                            item=item,
@@ -261,8 +283,14 @@ def getUserID(email):
 @app.route('/catalog/<int:item_id>/delete/', methods=['GET', 'POST'])
 @login_required
 def deleteItem(item_id):
+    """
+        Deletes selected item.
+
+        args:
+        item_id  - ID of selected item to delete
+    """
     itemToDelete = session.query(Item).filter_by(id=item_id).\
-            filter_by(user_id=login_session['user_id']).one()
+        filter_by(user_id=login_session['user_id']).one()
     if request.method == 'POST':
         session.delete(itemToDelete)
         session.commit()
@@ -277,8 +305,15 @@ def deleteItem(item_id):
 @app.route('/catalog/<int:item_id>/edit/', methods=['GET', 'POST'])
 @login_required
 def editItem(item_id):
+    """
+        Renders template to edit item.
+
+        args:
+        item_id - ID of item to edit
+    """
     item = session.query(Item).filter_by(id=item_id).\
-           filter_by(user_id=login_session['user_id']).one()
+        filter_by(user_id=login_session['user_id']).one()
+
     if item.user_id == login_session['user_id']:
         categories = session.query(Category).all()
         if request.method == 'POST':
@@ -303,11 +338,30 @@ def editItem(item_id):
 
 
 def getUserInfo(user_id):
+    """
+        Get user by ID.
+
+        args:
+        user_id - ID of logged in user
+
+        returns:
+        user
+    """
     user = session.query(User).filter_by(id=user_id).one()
     return user
 
 
 def createUser(login_session):
+    """
+        Creates new user from data in session, which is given by login
+        into Google.
+
+        args:
+        login_session - session should have username, email und picture
+
+        returns:
+        user.id - ID of created user
+    """
     newUser = User(name=login_session['username'],
                    email=login_session['email'],
                    picture=login_session['picture'])
