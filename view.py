@@ -315,7 +315,7 @@ def editItem(item_id):
         args:
         item_id - ID of item to edit
     """
-    item = session.query(Item).filter_by(id=item_id).one()
+    item = session.query(Item).filter_by(id=item_id).one_or_none()
 
     if item.user_id != login_session['user_id']:
         flash('You are not the owner of this item')
@@ -385,4 +385,5 @@ directly.
 if __name__ == '__main__':
     app.secret_key = 'super secret key'
     app.debug = True
+    # Set this to False in production
     app.run(host='0.0.0.0', port=5000)
