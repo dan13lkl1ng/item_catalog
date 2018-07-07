@@ -289,8 +289,12 @@ def deleteItem(item_id):
         args:
         item_id  - ID of selected item to delete
     """
-    itemToDelete = session.query(Item).filter_by(id=item_id).\
-        filter_by(user_id=login_session['user_id']).one()
+    itemToDelete = session.query(Item).filter_by(id=item_id).one()
+
+    if itemToDelete.user_id != login_session['user_id']:
+        flash('You are not the owner of this item!')
+        return redirect(url_for('showLatestItems'))
+
     if request.method == 'POST':
         session.delete(itemToDelete)
         session.commit()
@@ -311,8 +315,11 @@ def editItem(item_id):
         args:
         item_id - ID of item to edit
     """
-    item = session.query(Item).filter_by(id=item_id).\
-        filter_by(user_id=login_session['user_id']).one()
+    item = session.query(Item).filter_by(id=item_id).one()
+
+    if item.user_id != login_session['user_id']:
+        flash('You are not the owner of this item')
+        return redirect(url_for('showLatestItems'))
 
     if item.user_id == login_session['user_id']:
         categories = session.query(Category).all()
