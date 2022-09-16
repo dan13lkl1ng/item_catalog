@@ -35,7 +35,7 @@ lensfun==0.3.2
 lockfile==0.12.2
 louis==3.6.0
 lxml==4.2.2
-Mako==1.0.7
+Mako==1.2.2
 MarkupSafe==1.0
 matplotlib==2.2.2
 mccabe==0.6.1
