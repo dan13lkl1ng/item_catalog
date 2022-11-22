@@ -47,7 +47,7 @@ olefile==0.45.1
 openshot-qt==2.4.1
 packaging==17.1
 passlib==1.7.1
-Pillow==5.1.0
+Pillow==9.3.0
 ply==3.11
 progress==1.4
 pyasn1==0.4.3
